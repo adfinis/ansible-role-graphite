@@ -63,13 +63,13 @@ MAX_CACHE_SIZE = inf
 # prevent over-utilizing the disk and thus starving the rest of the system.
 # When the rate of required updates exceeds this, then carbon's caching will
 # take effect and increase the overall throughput accordingly.
-MAX_UPDATES_PER_SECOND = 500
+MAX_UPDATES_PER_SECOND = {{ graphite_carbon_cache_max_updates_per_second }}
 
 # If defined, this changes the MAX_UPDATES_PER_SECOND in Carbon when a
 # stop/shutdown is initiated.  This helps when MAX_UPDATES_PER_SECOND is
 # relatively low and carbon has cached a lot of updates; it enables the carbon
 # daemon to shutdown more quickly.
-# MAX_UPDATES_PER_SECOND_ON_SHUTDOWN = 1000
+MAX_UPDATES_PER_SECOND_ON_SHUTDOWN = {{ graphite_carbon_cache_max_updates_per_second_on_shutdown }}
 
 # Softly limits the number of whisper files that get created each minute.
 # Setting this value low (e.g. 50) is a good way to ensure that your carbon
@@ -91,7 +91,7 @@ MIN_TIMESTAMP_RESOLUTION = 1
 # in order to optimize batching. This means that each point will wait at least
 # the duration of this lag before being written. Setting this to 0 disable the feature.
 # This currently only works when using the timesorted write strategy.
-# MIN_TIMESTAMP_LAG = 0
+MIN_TIMESTAMP_LAG = {{ graphite_carbon_cache_min_timestamp_lag }}
 
 # Set the interface and port for the line (plain text) listener.  Setting the
 # interface to 0.0.0.0 listens on all interfaces.  Port can be set to 0 to
@@ -185,7 +185,7 @@ LOG_CACHE_QUEUE_SORTS = False
 # the OS's i/o scheduler is expected to compensate for the random write
 # pattern.
 #
-CACHE_WRITE_STRATEGY = sorted
+CACHE_WRITE_STRATEGY = {{ graphite_carbon_cache_cache_write_strategy }}
 
 # On some systems it is desirable for whisper to write synchronously.
 # Set this option to True if you'd like to try this. Basically it will

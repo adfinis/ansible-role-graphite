@@ -12,6 +12,8 @@ graphite_web_confdir: "/opt/graphite/webapp/graphite"
 graphite_web_timezone: "Europe/Zurich"
 graphite_web_staticdir: "/opt/graphite/static"
 
-carbon_service: "carbon-cache"
-carbon_confdir: "/opt/graphite/conf"
-carbon_binary: "/opt/graphite/bin/carbon-cache.py"
+graphite_carbon_confdir: "/opt/graphite/conf"
+graphite_carbon_cache_max_updates_per_second: 100
+graphite_carbon_cache_max_updates_per_second_on_shutdown: 1500
+graphite_carbon_cache_cache_write_strategy: timesorted
+graphite_carbon_cache_min_timestamp_lag: 150

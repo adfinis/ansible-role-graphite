@@ -14,7 +14,7 @@
 - name: write config files
   template:
     src: "{{ item.src }}"
-    dest: "{{ carbon_confdir }}/{{ item.dest }}"
+    dest: "{{ graphite_carbon_confdir }}/{{ item.dest }}"
   loop:
     - { src: 'templates/carbon/carbon.conf.j2', dest: 'carbon.conf' }
     - { src: 'templates/carbon/storage-schemas.conf.j2', dest: 'storage-schemas.conf' }
@@ -45,7 +45,6 @@
     PYTHONPATH: "/opt/graphite/webapp"
   args:
     creates: "{{ graphite_web_staticdir }}"
-  register: graphite_register_static_generated
 
 - name: configure mod-wsgi with python3
   shell: "mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf"
