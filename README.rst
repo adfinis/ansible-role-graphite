@@ -64,5 +64,5 @@ Author Information
 
 graphite role was written by:
 
-* Adfinis SyGroup AG | `Website <https://www.adfinis-sygroup.ch/>`_ | `Twitter <https://twitter.com/adfinissygroup>`_ | `GitHub <https://github.com/adfinis-sygroup>`_
+* Adfinis AG | `Website <https://www.adfinis.com/>`_ | `Twitter <https://twitter.com/adfinis>`_ | `GitHub <https://github.com/adfinis-sygroup>`_
 
