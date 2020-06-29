@@ -1,6 +1,15 @@
 ---
 
-# configure carbon
+- name: configure carbon-cache systemd service
+  copy:
+    src: systemd/carbon-cache.service
+    dest: /etc/systemd/system/carbon-cache.service
+
+- name: enable carbon-cache service
+  systemd:
+    name: carbon-cache
+    daemon_reload: yes
+    enabled: yes
 
 - name: write config files
   template:
@@ -12,13 +21,6 @@
     - { src: 'templates/carbon/storage-aggregation.conf.j2', dest: 'storage-aggregation.conf' }
   notify:
     - 'restart carbon cache'
-
-      #- name: enable carbon service
-      #  service:
-      #    name: "{{ carbon_service }}"
-      #    enabled: yes
-      #  notify:
-      #    - 'restart carbon cache'
 
 - name: write graphite-web configuration
   template:
