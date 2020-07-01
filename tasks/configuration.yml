@@ -1,24 +1,26 @@
 ---
 
-# configure carbon
+- name: configure carbon-cache systemd service
+  copy:
+    src: systemd/carbon-cache.service
+    dest: /etc/systemd/system/carbon-cache.service
+
+- name: enable carbon-cache service
+  systemd:
+    name: carbon-cache
+    daemon_reload: yes
+    enabled: yes
 
 - name: write config files
   template:
     src: "{{ item.src }}"
-    dest: "{{ carbon_confdir }}/{{ item.dest }}"
+    dest: "{{ graphite_carbon_confdir }}/{{ item.dest }}"
   loop:
     - { src: 'templates/carbon/carbon.conf.j2', dest: 'carbon.conf' }
     - { src: 'templates/carbon/storage-schemas.conf.j2', dest: 'storage-schemas.conf' }
     - { src: 'templates/carbon/storage-aggregation.conf.j2', dest: 'storage-aggregation.conf' }
   notify:
     - 'restart carbon cache'
-
-      #- name: enable carbon service
-      #  service:
-      #    name: "{{ carbon_service }}"
-      #    enabled: yes
-      #  notify:
-      #    - 'restart carbon cache'
 
 - name: write graphite-web configuration
   template:
@@ -43,7 +45,6 @@
     PYTHONPATH: "/opt/graphite/webapp"
   args:
     creates: "{{ graphite_web_staticdir }}"
-  register: graphite_register_static_generated
 
 - name: configure mod-wsgi with python3
   shell: "mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf"

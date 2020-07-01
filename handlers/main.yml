@@ -1,4 +1,6 @@
 ---
 
 - name: restart carbon cache
-  command: '{{ carbon_binary }} stop; {{ carbon_binary }} start'
+  systemd:
+    name: carbon-cache
+    state: restarted
