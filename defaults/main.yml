@@ -17,3 +17,5 @@ graphite_carbon_cache_max_updates_per_second: 100
 graphite_carbon_cache_max_updates_per_second_on_shutdown: 1500
 graphite_carbon_cache_cache_write_strategy: timesorted
 graphite_carbon_cache_min_timestamp_lag: 150
+graphite_use_pip: True
+graphite_use_git: False
