@@ -11,6 +11,15 @@
     daemon_reload: yes
     enabled: yes
 
+# @TODO This is probably not necessary, can maybe be removed
+- name: make sure config folders exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ graphite_carbon_confdir }}"
+    - "{{ graphite_web_confdir }}"
+
 - name: write config files
   template:
     src: "{{ item.src }}"
@@ -30,23 +39,23 @@
 - name: write graphite-web apache configuration
   template:
     src: "templates/graphite-web/graphite-web.conf.j2"
-    dest: "/etc/httpd/conf.d/graphite-web.conf"
+    dest: "{{ graphite_apache2_conf_path }}/graphite-web.conf"
 
 - name: initialize database
-  command: "/opt/rh/rh-python36/root/usr/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb"
+  command: "{{ graphite_python_djangoadmin_executable }} migrate --settings=graphite.settings --run-syncdb"
   environment:
     PYTHONPATH: "/opt/graphite/webapp"
   register: graphite_register_db_init
   changed_when: graphite_register_db_init.stdout is not search("No migrations to apply")
 
 - name: collect static files
-  command: "/opt/rh/rh-python36/root/usr/bin/django-admin.py collectstatic --settings=graphite.settings"
+  command: "{{ graphite_python_djangoadmin_executable }} collectstatic --settings=graphite.settings"
   environment:
     PYTHONPATH: "/opt/graphite/webapp"
   args:
     creates: "{{ graphite_web_staticdir }}"
 
 - name: configure mod-wsgi with python3
-  shell: "mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf"
+  shell: "mod_wsgi-express install-module > {{ graphite_apache2_mods_path }}/02-wsgi.conf"
   args:
-    creates: "/etc/httpd/conf.modules.d/02-wsgi.conf"
+    creates: "{{ graphite_apache2_mods_path }}/02-wsgi.conf"
