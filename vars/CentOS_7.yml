@@ -1,5 +1,9 @@
 ---
 
+graphite_apache2_conf_path: '/etc/httpd/conf.d'
+graphite_apache2_mods_path: '/etc/httpd/conf.modules.d'
+graphite_python_djangoadmin_executable: '/opt/rh/rh-python36/root/usr/bin/django-admin.py'
+graphite_python_pip_executable: "/opt/rh/rh-python36/root/usr/bin/pip3.6"
 graphite_requirements:
   - centos-release-scl
   - rh-python36
