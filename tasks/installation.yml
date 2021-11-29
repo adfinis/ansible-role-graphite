@@ -12,7 +12,7 @@
 
 - name: install graphite from pip
   pip:
-    executable: "/opt/rh/rh-python36/root/usr/bin/pip3.6"
+    executable: '{{ graphite_python_pip_executable }}'
     state: present
     name: "{{ item }}"
   loop: '{{ pip_packages }}'
@@ -20,3 +20,36 @@
   until: graphite_register_pip_installed is success
   retries: 10
   delay: 2
+  when: graphite_use_pip
+
+- name: install graphite from source
+  block:
+    - name: clone graphite-web
+      git:
+        repo: https://github.com/graphite-project/graphite-web.git
+        dest: /tmp/graphite-web
+    - name: install graphite-web
+      shell:
+        chdir: /tmp/graphite-web
+        cmd: 'python3 setup.py install'
+        creates: /opt/graphite/storage
+    - name: clone carbon
+      git:
+        repo: https://github.com/graphite-project/carbon.git
+        dest: /tmp/carbon
+    - name: install carbon
+      shell:
+        chdir: /tmp/carbon
+        cmd: 'python3 setup.py install'
+        creates: /opt/graphite/lib/carbon
+    - name: clone whisper
+      git:
+        repo: https://github.com/graphite-project/whisper.git
+        dest: /tmp/whisper
+    - name: install whisper
+      shell:
+        chdir: /tmp/whisper
+        cmd: 'python3 setup.py install'
+        creates: /usr/local/bin/whisper-dump.py
+  when: graphite_use_git
+
