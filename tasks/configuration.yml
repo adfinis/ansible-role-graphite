@@ -22,6 +22,7 @@
     - { src: templates/carbon/storage-aggregation.conf.j2, dest: storage-aggregation.conf }
   notify:
     - Restart carbon cache
+    - Makemigrations
 
 - name: Write graphite-web configuration
   ansible.builtin.template:
@@ -32,24 +33,43 @@
 - name: Write graphite-web apache configuration
   ansible.builtin.template:
     src: templates/graphite-web/graphite-web.conf.j2
-    dest: /etc/httpd/conf.d/graphite-web.conf
+    dest: "{{ graphite_web_webserver_dir }}/graphite-web.conf"
     mode: "0644"
+  notify: Enable graphite-web apache configuration
+
+- name: Copy debian specific graphite patch to server
+  ansible.builtin.copy:
+    src: patch/settings_debian.patch
+    dest: /tmp/settings_debian.patch
+    mode: "0644"
+  when: ansible_distribution == 'Debian'
 
 - name: Initialize database
-  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb
+  ansible.builtin.command: /opt/graphite/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb
   environment:
-    PYTHONPATH: /opt/graphite/webapp
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
   register: graphite_register_db_init
   changed_when: graphite_register_db_init.stdout is not search("No migrations to apply")
 
 - name: Collect static files
-  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py collectstatic --settings=graphite.settings
+  ansible.builtin.command: /opt/graphite/bin/django-admin.py collectstatic --settings=graphite.settings --noinput
   environment:
-    PYTHONPATH: /opt/graphite/webapp
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
   args:
     creates: "{{ graphite_web_staticdir }}"
 
-- name: Configure mod-wsgi with python3
-  ansible.builtin.shell: mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
-  args:
-    creates: /etc/httpd/conf.modules.d/02-wsgi.conf
+- name: Make sure webserver can read webfiles
+  ansible.builtin.file:
+    path: /opt/graphite/storage
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+
+- name: Make sure webserver can read webfiles
+  ansible.builtin.file:
+    path: /opt/graphite/cache
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data

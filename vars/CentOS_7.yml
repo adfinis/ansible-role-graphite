@@ -6,8 +6,4 @@ graphite_requirements:
   - cairo-devel
   - libffi-devel
 
-pip_packages:
-  - whisper
-  - carbon
-  - graphite-web
-  - mod-wsgi
+graphite_web_webserver_dir: /etc/httpd/conf.d/

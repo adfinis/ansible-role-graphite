@@ -9,13 +9,29 @@
   retries: 10
   delay: 2
 
-- name: Install graphite from pip
+- name: Install whisper
   ansible.builtin.pip:
-    executable: /opt/rh/rh-python36/root/usr/bin/pip3.6
-    state: present
-    name: "{{ item }}"
-  loop: "{{ pip_packages }}"
-  register: graphite_register_pip_installed
-  until: graphite_register_pip_installed is success
-  retries: 10
-  delay: 2
+    name: https://github.com/graphite-project/whisper/tarball/master
+    virtualenv: /opt/graphite
+    virtualenv_command: virtualenv
+    extra_args: "--no-binary=:all:"
+  environment:
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
+
+- name: Install carbon
+  ansible.builtin.pip:
+    name: https://github.com/graphite-project/carbon/tarball/master
+    virtualenv: /opt/graphite
+    virtualenv_command: virtualenv
+    extra_args: "--no-binary=:all:"
+  environment:
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
+
+- name: Install graphite-web
+  ansible.builtin.pip:
+    name: https://github.com/graphite-project/graphite-web/tarball/master
+    virtualenv: /opt/graphite
+    virtualenv_command: virtualenv
+    extra_args: "--no-binary=:all:"
+  environment:
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/

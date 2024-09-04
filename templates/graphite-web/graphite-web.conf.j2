@@ -23,9 +23,7 @@ WSGISocketPrefix run/wsgi
 
 <VirtualHost *:80>
         ServerName graphite.local
-        DocumentRoot "/opt/graphite/webapp"
-        ErrorLog /opt/graphite/storage/log/webapp/error.log
-        CustomLog /opt/graphite/storage/log/webapp/access.log common
+        DocumentRoot "{{ graphite_web_confdir }}"
 
         # I've found that an equal number of processes & threads tends
         # to show the best performance for Graphite (ymmv).
