@@ -1,52 +1,55 @@
 ---
-
-- name: configure carbon-cache systemd service
-  copy:
+- name: Configure carbon-cache systemd service
+  ansible.builtin.copy:
     src: systemd/carbon-cache.service
     dest: /etc/systemd/system/carbon-cache.service
+    mode: "0644"
 
-- name: enable carbon-cache service
-  systemd:
+- name: Enable carbon-cache service
+  ansible.builtin.systemd:
     name: carbon-cache
-    daemon_reload: yes
-    enabled: yes
+    daemon_reload: true
+    enabled: true
 
-- name: write config files
-  template:
+- name: Write config files
+  ansible.builtin.template:
     src: "{{ item.src }}"
     dest: "{{ graphite_carbon_confdir }}/{{ item.dest }}"
+    mode: "0644"
   loop:
-    - { src: 'templates/carbon/carbon.conf.j2', dest: 'carbon.conf' }
-    - { src: 'templates/carbon/storage-schemas.conf.j2', dest: 'storage-schemas.conf' }
-    - { src: 'templates/carbon/storage-aggregation.conf.j2', dest: 'storage-aggregation.conf' }
+    - { src: templates/carbon/carbon.conf.j2, dest: carbon.conf }
+    - { src: templates/carbon/storage-schemas.conf.j2, dest: storage-schemas.conf }
+    - { src: templates/carbon/storage-aggregation.conf.j2, dest: storage-aggregation.conf }
   notify:
-    - 'restart carbon cache'
+    - Restart carbon cache
 
-- name: write graphite-web configuration
-  template:
-    src: "templates/graphite-web/local_settings.py.j2"
+- name: Write graphite-web configuration
+  ansible.builtin.template:
+    src: templates/graphite-web/local_settings.py.j2
     dest: "{{ graphite_web_confdir }}/local_settings.py"
+    mode: "0644"
 
-- name: write graphite-web apache configuration
-  template:
-    src: "templates/graphite-web/graphite-web.conf.j2"
-    dest: "/etc/httpd/conf.d/graphite-web.conf"
+- name: Write graphite-web apache configuration
+  ansible.builtin.template:
+    src: templates/graphite-web/graphite-web.conf.j2
+    dest: /etc/httpd/conf.d/graphite-web.conf
+    mode: "0644"
 
-- name: initialize database
-  command: "/opt/rh/rh-python36/root/usr/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb"
+- name: Initialize database
+  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb
   environment:
-    PYTHONPATH: "/opt/graphite/webapp"
+    PYTHONPATH: /opt/graphite/webapp
   register: graphite_register_db_init
   changed_when: graphite_register_db_init.stdout is not search("No migrations to apply")
 
-- name: collect static files
-  command: "/opt/rh/rh-python36/root/usr/bin/django-admin.py collectstatic --settings=graphite.settings"
+- name: Collect static files
+  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py collectstatic --settings=graphite.settings
   environment:
-    PYTHONPATH: "/opt/graphite/webapp"
+    PYTHONPATH: /opt/graphite/webapp
   args:
     creates: "{{ graphite_web_staticdir }}"
 
-- name: configure mod-wsgi with python3
-  shell: "mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf"
+- name: Configure mod-wsgi with python3
+  ansible.builtin.shell: mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
   args:
-    creates: "/etc/httpd/conf.modules.d/02-wsgi.conf"
+    creates: /etc/httpd/conf.modules.d/02-wsgi.conf

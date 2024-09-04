@@ -3,7 +3,7 @@
 graphite_requirements:
   - centos-release-scl
   - rh-python36
-  - cairo-devel 
+  - cairo-devel
   - libffi-devel
 
 pip_packages:
