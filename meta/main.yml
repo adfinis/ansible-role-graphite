@@ -1,14 +1,14 @@
 ---
 
 dependencies: []
-
 galaxy_info:
-  role_name: 'graphite'
-  author: 'Adfinis SyGroup AG'
-  description: 'Install and manage graphite'
-  company: 'Adfinis SyGroup AG'
-  license: 'GNU General Public License v3'
-  min_ansible_version: '2.0.0'
+  role_name: graphite
+  namespace: adfinis
+  author: Adfinis AG
+  description: Install and manage graphite
+  company: Adfinis AG
+  license: GNU General Public License v3
+  min_ansible_version: 2.0.0
   platforms:
     # - name: Debian
     # versions:
@@ -22,7 +22,7 @@ galaxy_info:
     - name: EL
       versions:
         # - 6
-        - 7
+        - "7"
   galaxy_tags:
     - graphite
     - tsdb

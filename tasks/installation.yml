@@ -1,21 +1,20 @@
 ---
-
-- name: install required packages
-  package:
-    name: '{{ item }}'
+- name: Install required packages
+  ansible.builtin.package:
+    name: "{{ item }}"
     state: present
-  loop: '{{ graphite_requirements }}'
+  loop: "{{ graphite_requirements }}"
   register: graphite_register_rpms_installed
   until: graphite_register_rpms_installed is success
   retries: 10
   delay: 2
 
-- name: install graphite from pip
-  pip:
-    executable: "/opt/rh/rh-python36/root/usr/bin/pip3.6"
+- name: Install graphite from pip
+  ansible.builtin.pip:
+    executable: /opt/rh/rh-python36/root/usr/bin/pip3.6
     state: present
     name: "{{ item }}"
-  loop: '{{ pip_packages }}'
+  loop: "{{ pip_packages }}"
   register: graphite_register_pip_installed
   until: graphite_register_pip_installed is success
   retries: 10
