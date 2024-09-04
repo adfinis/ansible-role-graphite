@@ -1,4 +1,9 @@
 ---
+- name: Update apt package cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: ansible_distribution == 'Debian'
+
 - name: Install required packages
   ansible.builtin.package:
     name: "{{ item }}"
@@ -30,6 +35,15 @@
 - name: Install graphite-web
   ansible.builtin.pip:
     name: https://github.com/graphite-project/graphite-web/tarball/master
+    virtualenv: /opt/graphite
+    virtualenv_command: virtualenv
+    extra_args: "--no-binary=:all:"
+  environment:
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
+
+- name: Install gunicorn
+  ansible.builtin.pip:
+    name: gunicorn
     virtualenv: /opt/graphite
     virtualenv_command: virtualenv
     extra_args: "--no-binary=:all:"

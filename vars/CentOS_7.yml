@@ -1,9 +1,0 @@
----
-
-graphite_requirements:
-  - centos-release-scl
-  - rh-python36
-  - cairo-devel
-  - libffi-devel
-
-graphite_web_webserver_dir: /etc/httpd/conf.d/
