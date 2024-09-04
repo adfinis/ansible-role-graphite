@@ -5,12 +5,6 @@
     dest: /etc/systemd/system/carbon-cache.service
     mode: "0644"
 
-- name: Enable carbon-cache service
-  ansible.builtin.systemd:
-    name: carbon-cache
-    daemon_reload: true
-    enabled: true
-
 - name: Write config files
   ansible.builtin.template:
     src: "{{ item.src }}"
@@ -22,6 +16,7 @@
     - { src: templates/carbon/storage-aggregation.conf.j2, dest: storage-aggregation.conf }
   notify:
     - Restart carbon cache
+    - Makemigrations
 
 - name: Write graphite-web configuration
   ansible.builtin.template:
@@ -29,27 +24,52 @@
     dest: "{{ graphite_web_confdir }}/local_settings.py"
     mode: "0644"
 
-- name: Write graphite-web apache configuration
-  ansible.builtin.template:
-    src: templates/graphite-web/graphite-web.conf.j2
-    dest: /etc/httpd/conf.d/graphite-web.conf
-    mode: "0644"
-
 - name: Initialize database
-  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb
+  ansible.builtin.command: /opt/graphite/bin/django-admin.py migrate --settings=graphite.settings --run-syncdb
   environment:
-    PYTHONPATH: /opt/graphite/webapp
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
   register: graphite_register_db_init
   changed_when: graphite_register_db_init.stdout is not search("No migrations to apply")
 
 - name: Collect static files
-  ansible.builtin.command: /opt/rh/rh-python36/root/usr/bin/django-admin.py collectstatic --settings=graphite.settings
+  ansible.builtin.command: /opt/graphite/bin/django-admin.py collectstatic --settings=graphite.settings --noinput
   environment:
-    PYTHONPATH: /opt/graphite/webapp
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
   args:
     creates: "{{ graphite_web_staticdir }}"
 
-- name: Configure mod-wsgi with python3
-  ansible.builtin.shell: mod_wsgi-express install-module > /etc/httpd/conf.modules.d/02-wsgi.conf
-  args:
-    creates: /etc/httpd/conf.modules.d/02-wsgi.conf
+- name: Make sure webserver can read webfiles
+  ansible.builtin.file:
+    path: /opt/graphite/storage
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+
+- name: Make sure webserver can read webfiles
+  ansible.builtin.file:
+    path: /opt/graphite/cache
+    state: directory
+    recurse: true
+    owner: www-data
+    group: www-data
+
+- name: Copy systemd unit for graphite-web
+  ansible.builtin.template:
+    src: templates/graphite-web/graphite-web.service.j2
+    dest: /etc/systemd/system/graphite-web.service
+    mode: "0644"
+
+- name: Enable carbon-cache service
+  ansible.builtin.systemd:
+    name: carbon-cache
+    daemon_reload: true
+    enabled: true
+    state: started
+
+- name: Enable and start graphite-web service
+  ansible.builtin.systemd:
+    name: graphite-web
+    daemon_reload: true
+    enabled: true
+    state: started

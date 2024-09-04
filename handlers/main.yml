@@ -3,3 +3,24 @@
   ansible.builtin.systemd:
     name: carbon-cache
     state: restarted
+
+- name: Restart httpd
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+
+- name: Restart apache2
+  ansible.builtin.service:
+    name: apache2
+    state: restarted
+
+- name: Makemigrations # noqa no-changed-when
+  ansible.builtin.command: /opt/graphite/bin/django-admin.py makemigrations --settings=graphite.settings
+  environment:
+    PYTHONPATH: /opt/graphite/lib/:/opt/graphite/webapp/
+
+- name: Enable graphite-web apache configuration # noqa no-changed-when
+  ansible.builtin.command: a2enconf graphite-web.conf
+  notify:
+    - Restart apache2
+  when: ansible_distribution == 'Debian'

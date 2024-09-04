@@ -1,0 +1,11 @@
+---
+
+graphite_requirements:
+  - python3
+  - python3-pip
+  - python3-virtualenv
+  - libffi-dev
+  - libcairo-dev
+  - libapache2-mod-wsgi-py3
+
+graphite_web_webserver_dir: /etc/apache2/conf-available
