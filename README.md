@@ -51,5 +51,4 @@ variables passed in as parameters) is always nice for users too:
 graphite role was written by:
 
 -   Adfinis AG \| [Website](https://www.adfinis.com/) \|
-    [Twitter](https://twitter.com/adfinis) \|
     [GitHub](https://github.com/adfinis-sygroup)
